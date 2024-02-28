@@ -176,14 +176,12 @@ def checkBoard():
                 full.append(i)
         return full
     full = findFull()
-    print(str(full))
     def removeFull():
         for y in full:
             for x in range(0, WIDTH):
                 delete = []
                 for f in fallenTetrominoes:
                     if f[0] == x and f[1] == y:
-                        print("ERASING: " + str(f))
                         delete.append(f)
                         waffle.pixel(x,y).color = "white"
                 for d in delete:
@@ -191,17 +189,12 @@ def checkBoard():
     removeFull()
 
     def fallFull():
-        print(str(fallenTetrominoes))
         full.sort()
         for i in full:
             new = []
             delete = []
-            print(str(i))
             for f in fallenTetrominoes:
-                print("before: " + str(f))
                 if f[1] < i:
-                    print("DELETING: " + str(f))
-                    print("APPENDING: (" + str(f[0]) + ", " + str(f[1] + 1) + ", " + f[2] + ")")
                     new.append((f[0], f[1] + 1, f[2]))
                     delete.append(f)
             for d in delete:
@@ -228,7 +221,6 @@ def func():
         T.addToFallen()
         T = tetromino()
     checkBoard()
-    print(str(fallenTetrominoes))
 app.repeat(500, func)
 
 def turnLeft():

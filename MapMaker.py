@@ -17,7 +17,7 @@ def askSize():
     app.hide()
     size = app.question(title="Size", question="Enter the size of map you want to create.", initial_value=10)
     if size is None:
-        exit(69)
+        exit(1)
     if not size == str(int(size)):
         size = 10
     size = int(size)

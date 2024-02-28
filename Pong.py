@@ -1,5 +1,6 @@
 from guizero import App, Box, Drawing, Text
-from random import random
+import random
+import math
 from game_window import GameWindowInterface
 
 NAME = "PONG by 184474"
@@ -33,12 +34,11 @@ class PongGame(GameWindowInterface):
         game = Box(self.app, height="fill", width="fill")
         self.game_area = Drawing(game, height="fill", width="fill")
 
-
         self.left_paddle = Paddle(self, True)
         self.right_paddle = Paddle(self, False)
 
-        # left_score = Text(left_padding, align="left", text=str(left), color="white")
-        # right_score = Text(right_padding, align="right", text=str(right), color="white")
+        self.left_score = Text(self.app, text=str(self. game_state.left), size=self.padding_y // 2, color="white", align="left", width="fill")
+        self.right_score = Text(self.app, text=str(self. game_state.right), size=self.padding_y // 2, color="white", align="right", width="fill")
 
         self.ball = Ball(self)
 
@@ -104,8 +104,8 @@ class PongGame(GameWindowInterface):
         self.handlePaddleCollisions()
 
     def difficulty(self):
-        self.ball.dx *= 1 + random() * 0.1
-        self.ball.dy *= 1 + random() * 0.1
+        self.ball.dx *= 1 + random.random() * 0.1
+        self.ball.dy *= 1 + random.random() * 0.1
 
     def draw_paddles(self):
         self.game_area.rectangle(self.left_paddle.x,
@@ -120,25 +120,21 @@ class PongGame(GameWindowInterface):
     def draw_ball(self):
         self.game_area.rectangle(self.ball.x, self.ball.y, self.ball.x + self.ball.ball_size, self.ball.y + self.ball.ball_size, color="white")
 
-    # def draw_dividing_line(self):
-    #     # TODO
-    #     # the line should be dashed
-    #     self.game_area.line(x1=game_width / 2, y1=0, x2=game_width / 2, y2=HEIGHT, color="white", width=2)
+    def draw_map(self):
+        self.game_area.line(x1=self.gameWindowBeginningX(), y1=self.gameWindowBeginningY(), x2=self.gameWindowEndingX(), y2=self.gameWindowBeginningY(), color="white", width=2)
+        self.game_area.line(x1=self.gameWindowBeginningX(), y1=self.gameWindowEndingY(), x2=self.gameWindowEndingX(), y2=self.gameWindowEndingY(), color="white", width=2)
 
-    # def draw_score(self):
-    #     # TODO
-    #     # the score should be displayed on the top of the middle of the game area for each player
-    #     self.left_score.clear()
-    #     self.right_score.clear()
-    #     self.left_score.append(str(self.game_state.left))
-    #     self.right_score.append(str(self.game_state.right))
+    def draw_dividing_line(self):
+        self.game_area.line(x1=(self.gameWindowEndingX() + self.gameWindowBeginningX()) / 2, y1=self.gameWindowBeginningY(), x2=(self.gameWindowEndingX() + self.gameWindowBeginningX()) / 2, y2=self.gameWindowEndingY(), color="white", width=2)
 
     def updateView(self):
         self.game_area.clear()
+        self.draw_map()
         self.draw_paddles()
-        # self.draw_dividing_line()
+        self.draw_dividing_line()
         self.draw_ball()
-        # self.draw_score()
+        self.right_score.value = str(self.game_state.right)
+        self.left_score.value = str(self.game_state.left)
 
 
 class Paddle:
@@ -150,10 +146,10 @@ class Paddle:
 
         if position:
             self.x = self.game_window.padding_x
-            self.y = self.game_window.gameWindowBeginningY()
+            self.y = (self.game_window.gameWindowEndingY() + self.game_window.gameWindowBeginningY() - self.paddle_height) // 2
         else:
             self.x = self.game_window.width - self.game_window.padding_x - self.paddle_width
-            self.y = self.game_window.gameWindowBeginningY()
+            self.y = (self.game_window.gameWindowEndingY() + self.game_window.gameWindowBeginningY() - self.paddle_height) // 2
 
         self.upper_boundary = self.game_window.gameWindowBeginningY()
         self.lower_boundary = self.game_window.gameWindowEndingY()
@@ -193,9 +189,14 @@ class Ball:
         self.left_boundary = self.game_window.gameWindowBeginningX()
         self.right_boundary = self.game_window.gameWindowEndingX()
 
-        rand = random()
-        self.dx = -3 if rand < 0.125 else -3 if rand < 0.25 else 3 if rand < 0.375 else 3 if rand < 0.5 else -1 if rand < 0.625 else -1 if rand < 0.75 else 1 if rand < 0.875 else 1
-        self.dy = -1 if rand < 0.125 else 1 if rand < 0.25 else -1 if rand < 0.375 else 1 if rand < 0.5 else -3 if rand < 0.625 else 3 if rand < 0.75 else -3 if rand < 0.875 else 3
+        # Generate random values for dx and dy within a certain range
+        self.dx = random.uniform(-3.5, 3.5)
+        self.dy = random.uniform(-1, 1)
+
+        # Ensure dx and dy are not too close to zero to avoid slow movement
+        while abs(self.dx) < 0.25 or abs(self.dy) < 0.1 or math.sqrt(self.dx ** 2 + self.dy ** 2) < 2:
+            self.dx = random.uniform(-3.5, 3.5)
+            self.dy = random.uniform(-1, 1)
 
     def upperY(self):
         return self.y
