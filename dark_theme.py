@@ -1,23 +1,19 @@
+DARK_THEME = (
+    ("background", "#2d2d2d"),
+    ("foreground", "white"),
+    ("activebackground", "#2d2d2d"),
+    ("activeforeground", "white"),
+)
+
+
 def dark_theme_element(elem):
-    try:
-        elem.tk.config(background='#2d2d2d')
-    except:
-        print(f"The element \"{elem}\" doesn't have a background parameter.")
-
-    try:
-        elem.tk.config(foreground='white')
-    except:
-        print(f"The element \"{elem}\" doesn't have a foreground parameter.")
-
-    try:
-        elem.tk.config(activebackground='#2d2d2d')
-    except:
-        print(f"The element \"{elem}\" doesn't have a activebackground parameter.")
-
-    try:
-        elem.tk.config(activeforeground='white')
-    except:
-        print(f"The element \"{elem}\" doesn't have a activeforeground parameter.")
+    # Not every widget accepts every one of these, and the ones that do not are simply
+    # left as they are. A frame having no activebackground is normal, not worth reporting
+    for option, value in DARK_THEME:
+        try:
+            elem.tk.config(**{option: value})
+        except Exception:
+            pass
 
 
 def apply(elems):
